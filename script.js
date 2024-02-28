@@ -29,20 +29,27 @@ const GameBoard =(function(){
 const Player = (playerName, playerMarker) => {
     let name = playerName;
     let marker = playerMarker;
+    let score = 0;
 
     const getName = () => name;
     const  getMarker = () => marker;
+    const getScore = () => score;
 
-    return { getName, getMarker};
+    const updateScore = () => score++;
+
+    const resetScore = () => score = 0;
+
+    return { getName, getMarker, getScore, updateScore, resetScore };
 }
 
 const PlayGame = function() {
     let firstPlayer;
     let secondPlayer;
     let currentPlayer;
+    
 
     // This function is called when we're ready to start the game. 
-    const startGame = (player1 = "Player 1", player2 = "Player 2") => {
+    const startGame = (player1 , player2 ) => {
         firstPlayer = Player(player1, 'X');
         secondPlayer = Player(player2, 'O');
         currentPlayer = firstPlayer;
@@ -62,6 +69,7 @@ const PlayGame = function() {
             // TODO : add some logic to make the UI shake or something. 
             return; // stops execution if move is invalid. 
         }
+        // Place the game marker at a particular position. 
         GameBoard.placeMarker(position, currentPlayer.getMarker());
         console.log(currentPlayer.getName() + "placed an " + currentPlayer.getMarker()+ " at index "+ position);
         
@@ -86,18 +94,111 @@ const PlayGame = function() {
             // TODO: update the display for tie. 
             return true;
         }
-        // Add logic to check for win conditions. Return true if a win conditon is met, otherwise false to continue game. For now return false. 
-        return false;
+        if(checkWinCondition()) {
+            // Game over, a player has won. 
+            return true;
+        }
     };
+
     // Check if the game board is full (no empty spaces)
     const isBoardFull = () => {
         return GameBoard.board.every(space => space !== "");
     }
 
+    const checkWinCondition = () => {
+        const winConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        for (let condition of winConditions) {
+            const [a, b, c] = condition;
+            if (GameBoard.board[a] !== "" && 
+                GameBoard.board[a] === GameBoard.board[b] && 
+                GameBoard.board[a] === GameBoard.board[c]) {
+                console.log("Game over: " + currentPlayer.getName() + " wins!");
+                //update player score. 
+                currentPlayer.updateScore();
+                // TODO: Update the display/UI for win
+                //Update scoreboard display
+                renderScores();
+                return true;
+            }
+        }
+        return false;
+
+    };
+
+    const playAgain = () => {
+        GameBoard.clearBoard();
+    }
+    const resetGame = () => {
+        // Clear the game board
+        GameBoard.clearBoard();
+        
+        // reset the scores
+        player1.resetScore();
+        player2.resetScore();
+
+    };
+    // This function renders the scores on the score board. 
+    function renderScores() {
+        const player1Score = document.querySelector(".player1");
+        const player2Score = document.querySelector(".player2");
+
+        player1Score.textContent = `${firstPlayer.getName()} - Score: ${firstPlayer.getScore()}`;
+        player2Score.textContent = `${secondPlayer.getName()} - Score: ${secondPlayer.getScore()}`;
+    }
+
     return {
         startGame,
         getCurrentPlayer,
-        placeCurrentPlayerMarker
+        placeCurrentPlayerMarker,
+        resetGame,
+        renderScores
     };
 }();
+
+const DisplayModal = (function() {
+    let firstPlayerName;
+    let secondPlayerName;
+
+    const player1Input = document.querySelector("#player1");
+    const player2Input = document.querySelector("#player2");
+    const submitButton = document.querySelector("#submit");
+    const dialogBox = document.querySelector(".modal");
+    const newGameButton = document.querySelector(".new-game-button");
+
+    submitButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        firstPlayerName = player1Input.value;
+        secondPlayerName = player2Input.value;
+
+        PlayGame.startGame(firstPlayerName, secondPlayerName);
+        PlayGame.renderScores();
+        dialogBox.close();
+    });
+
+    newGameButton.addEventListener('click', ()=>{
+        dialogBox.show();
+        player1Input.value = firstPlayerName;
+        player2Input.value = secondPlayerName;
+        PlayGame.resetGame();
+    });
+   
+
+})();
+
+// const InteractiveBoard = function() {
+//     cells = document.querySelectorAll(".cell");
+//     cells.forEach( cell => {
+//         cell.addEventListener('click')
+//     })
+// }
 
