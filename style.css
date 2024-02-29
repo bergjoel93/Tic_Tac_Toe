@@ -24,6 +24,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    
 }
 
 .board {
@@ -32,13 +33,18 @@ body {
     grid-template-rows: repeat(3, 1fr);
     gap: 10px;
     background-color: black;
+    margin: 36px;
 }
 
 .cell {
     width: 200px;
     height: 200px;
-    background-color: var(--cellColor)
-    
+    background-color: var(--cellColor);
+    cursor: pointer;
+    font-size: 15rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .scores {
@@ -68,6 +74,7 @@ button.new-game-button {
     border-style: none;
     border-radius: 8px;
     background-color: var(--buttonColor);
+    cursor: pointer;
 }
 
 /* Dialog box */
@@ -111,23 +118,42 @@ button.new-game-button {
     font-size: 1.3rem;
 }
 
-.close-btn {
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    background-color: #DC7373;
-    width: 40px;
-    height: 40px;
-    border-radius: 0 12px 0 0;
-    border-style: none;
-    color: white;
-    cursor: pointer;
-}
-
 #submit {
     background-color: #76dbef;
     font-size: 1.8rem;
     line-height: 12px;
     font-weight: bold;
     cursor:pointer;
+}
+
+/* End game dialog box */
+#end-round-dialog {
+    width: 35%;
+    padding: 24px;
+    /* display: flex;  */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; 
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    border-radius: 12px;
+    border: none;
+    background-color: #f0eef1;
+}
+
+#end-round-dialog button {
+    font-size: 1.2rem;
+    color: white;
+    margin: 16px;
+    padding: 16px;
+    border-style: none;
+    border-radius: 8px;
+    background-color: var(--buttonColor);
+    cursor: pointer;
+}
+#winning-message{
+    padding: 16px;
 }

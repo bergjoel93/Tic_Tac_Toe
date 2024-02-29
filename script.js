@@ -5,7 +5,10 @@ const GameBoard =(function(){
     let board = Array(9).fill("");
 
     //Method to clear the board
-    const clearBoard = () => board = Array(9).fill("");
+    const clearBoard = () => {
+        board.fill("");
+        console.log("GameBoard array cleared.");
+    } 
 
     // Method to place a marker (either X or O)
     const placeMarker = (position, marker) => board[position] = marker;
@@ -69,19 +72,22 @@ const PlayGame = function() {
             // TODO : add some logic to make the UI shake or something. 
             return; // stops execution if move is invalid. 
         }
-        // Place the game marker at a particular position. 
-        GameBoard.placeMarker(position, currentPlayer.getMarker());
-        console.log(currentPlayer.getName() + "placed an " + currentPlayer.getMarker()+ " at index "+ position);
-        
-        // Check for game over 
-        if(checkGameOver()) {
-            console.log("Game over condition met.")
-            // TODO: update the UI. 
-            return; // stop exectuion and don't change players. 
-        }
+        else{
+            // Place the game marker at a particular position. 
+            GameBoard.placeMarker(position, currentPlayer.getMarker());
+            console.log(currentPlayer.getName() + " placed an " + currentPlayer.getMarker()+ " at index "+ position);
+            
+            // Check for game over 
+            if(checkGameOver()) {
+                console.log("Game over condition met.")
+                // TODO: update the UI. 
+                return; // stop exectuion and don't change players. 
+            }
 
-        changeCurrentPlayer();
-        // TODO: update the display/UI
+            changeCurrentPlayer();
+            // TODO: update the display/UI
+        }
+        
     }
     //Checks if the move is valid before placing it. 
     const isValidMove = (position) => {
@@ -92,6 +98,7 @@ const PlayGame = function() {
         if(isBoardFull()) {
             console.log("Game over: It's a tie!");
             // TODO: update the display for tie. 
+            endOfRound("none", true);
             return true;
         }
         if(checkWinCondition()) {
@@ -126,6 +133,7 @@ const PlayGame = function() {
                 //update player score. 
                 currentPlayer.updateScore();
                 // TODO: Update the display/UI for win
+                endOfRound(currentPlayer.getName(), false);
                 //Update scoreboard display
                 renderScores();
                 return true;
@@ -137,14 +145,18 @@ const PlayGame = function() {
 
     const playAgain = () => {
         GameBoard.clearBoard();
+        InteractiveBoard.clearBoard();
     }
+
     const resetGame = () => {
         // Clear the game board
         GameBoard.clearBoard();
         
         // reset the scores
-        player1.resetScore();
-        player2.resetScore();
+        firstPlayer.resetScore();
+        secondPlayer.resetScore();
+
+        InteractiveBoard.clearBoard();
 
     };
     // This function renders the scores on the score board. 
@@ -161,7 +173,8 @@ const PlayGame = function() {
         getCurrentPlayer,
         placeCurrentPlayerMarker,
         resetGame,
-        renderScores
+        renderScores,
+        playAgain
     };
 }();
 
@@ -173,8 +186,10 @@ const DisplayModal = (function() {
     const player2Input = document.querySelector("#player2");
     const submitButton = document.querySelector("#submit");
     const dialogBox = document.querySelector(".modal");
-    const newGameButton = document.querySelector(".new-game-button");
-
+    const resets = document.querySelectorAll(".new-game-button");
+    const playAgain = document.querySelector("#play-again-button")
+    const endRoundDialog = document.querySelector("#end-round-dialog");
+    
     submitButton.addEventListener('click', (e) => {
         e.preventDefault();
         firstPlayerName = player1Input.value;
@@ -185,20 +200,79 @@ const DisplayModal = (function() {
         dialogBox.close();
     });
 
-    newGameButton.addEventListener('click', ()=>{
+    resets.forEach(reset =>{
+        reset.addEventListener('click', ()=>{
         dialogBox.show();
         player1Input.value = firstPlayerName;
         player2Input.value = secondPlayerName;
         PlayGame.resetGame();
+        endRoundDialog.close();
+        
+        });
     });
-   
+    
+
+    //logic for playAgain? button
+   playAgain.addEventListener('click', ()=>{
+    PlayGame.playAgain();
+    endRoundDialog.close();
+   });
 
 })();
 
-// const InteractiveBoard = function() {
-//     cells = document.querySelectorAll(".cell");
-//     cells.forEach( cell => {
-//         cell.addEventListener('click')
-//     })
-// }
+const InteractiveBoard = (function() {
+    cells = document.querySelectorAll(".cell");
+    cells.forEach( cell => {
+        cell.addEventListener('click', () =>{
+            // If a player clicks a cell we need to keep track of who clicked it and then place the corresponding marker there. Then we invoke the placeMarker function so that that space is kept track of. 
+            // We need to obtain the value of the cell that was clicked. 
+            let cellValue = cell.getAttribute("data-value");
+            console.log("Cell #"+cellValue + " chosen");
+            // obtain currentPlayer's marker
+            let currentPlayerMarker = PlayGame.getCurrentPlayer().getMarker();
+            //Add the current player marker to the board. 
+            // TODO: we may have an issue with execution and may need to check if there is already a marker there. 
+            PlayGame.placeCurrentPlayerMarker(cellValue);
+            //add the marker to the cell. 
+            if(cell.textContent === ""){
+                cell.textContent = currentPlayerMarker;
+            }
+            
+        });
+    });
+
+    const isCellFilled = () =>{
+        return 
+    }
+
+    // logic to render the board and remove all inner html. 
+    const clearBoard = () =>{
+        cells.forEach(cell =>{
+            cell.textContent = "";
+        });
+    }
+
+    return {clearBoard};
+})();
+/**
+ * 
+ * @param {*} player - The name of the player who one or if "no one" wins. 
+ * @param {*} isScratch - boolean to check if gameboard is filled and it's a tie. 
+ */
+const endOfRound =  function(player, isScratch) {
+    const endRoundBox = document.querySelector("#end-round-dialog");
+    const winMessage = document.querySelector("#winning-message");
+    if(isScratch){
+        endRoundBox.show();
+        winMessage.textContent = `It's a tie. No one wins `;
+         
+    }
+    else{
+        endRoundBox.show();
+        winMessage.textContent = `${player} won this round!`;
+    }
+    
+    
+
+}
 
