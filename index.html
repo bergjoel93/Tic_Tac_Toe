@@ -10,20 +10,24 @@
 <body>
 
     <dialog class ="modal" open >
-        
-        <form method="dialog" id="newGame">
-            <h3>Tic-Tac-Toe</h3>
-            <input type="text" name="player1" id="player1" placeholder="Player1" required maxlength="30" value = "Player 1">
-            <input type="text" name="player2" id="player2" placeholder="Player 2" required maxlength="30" value = "Player 2">
-            
-            <input type="submit" name ="submit" value="Play Game!" id="submit">
-        </form>
+        <div class="dialog-container">
+            <form method="dialog" id="newGame">
+                <h3>Tic-Tac-Toe</h3>
+                <input type="text" name="player1" id="player1" placeholder="Player1" required maxlength="30" value = "Player 1">
+                <input type="text" name="player2" id="player2" placeholder="Player 2" required maxlength="30" value = "Player 2">
+                
+                <input type="submit" name ="submit" value="Play Game!" id="submit">
+            </form>
+        </div>
     </dialog>
 
     <dialog id="end-round-dialog">
-        <h2 id="winning-message">Player won this round!</h2>
-        <button id="play-again-button">Play Again?</button>
-        <button class="new-game-button">Reset</button>
+        <div class="dialog-container">
+            <h2 id="winning-message">Player won this round!</h2>
+            <button id="play-again-button">Play Again?</button>
+            <button class="new-game-button">Reset</button>
+        </div>
+        
     </dialog>
     
     <div class="content">
